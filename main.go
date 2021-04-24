@@ -22,6 +22,7 @@ var (
 var ndk string
 
 func main() {
+	flag.Parse()
 	usr, err := user.Current()
 	if err != nil {
 		log.Fatal(err)
