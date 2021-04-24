@@ -7,6 +7,6 @@ import (
 	"runtime"
 )
 
-func Build(combo string, tags string, binname string, builddir string) {
+func Build(combo string, tags string, binname string, builddir string, version string) {
 	log.Fatal(runtime.GOOS, runtime.GOARCH, "")
 }

@@ -37,8 +37,11 @@ func main() {
 			log.Fatal("Invalid " + i + " provided.")
 		}
 		GOOS := spl[0]
+		log.Println("Compiling...")
 		compiler.Build(i, *tags, *binname, *builddir+"/bin", ndk)
 		if GOOS == "linux" {
+
+			log.Println("Packaging...")
 			debpackage.Build(i, *binname, *builddir+"/bin", *builddir+"/deb", *version)
 		}
 	}
