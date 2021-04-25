@@ -25,6 +25,7 @@ var ndk string
 var version string
 
 func main() {
+	flag.Parse()
 	t := time.Now()
 	year := "" + strconv.Itoa(t.Year())
 	month := "0" + strconv.Itoa(int(t.Month()))
