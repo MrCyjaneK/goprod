@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func Build(combo string, tags string, binname string, builddir string, ndk string) {
+func Build(combo string, tags string, binname string, builddir string, ndk string, ldflags string) {
 	spl := strings.Split(combo, "/")
 	if len(spl) != 2 {
 		log.Fatal("Invalid " + combo + " provided.")
@@ -21,7 +21,7 @@ func Build(combo string, tags string, binname string, builddir string, ndk strin
 	if GOOS == "windows" {
 		appendix = ".exe"
 	}
-	cmd := exec.Command("go", "build", "-o", builddir+"/"+binname+"_"+strings.ToLower(GOOS)+"_"+strings.ToLower(GOARCH)+appendix, "-tags", tags)
+	cmd := exec.Command("go", "build", "--ldflags", ldflags, "-o", builddir+"/"+binname+"_"+strings.ToLower(GOOS)+"_"+strings.ToLower(GOARCH)+appendix, "-tags", tags)
 	// Import env
 	out, err := exec.Command("printenv").Output()
 	if err != nil {
