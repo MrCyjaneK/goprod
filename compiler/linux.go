@@ -21,7 +21,7 @@ func Build(combo string, tags string, binname string, builddir string, ndk strin
 	if GOOS == "windows" {
 		appendix = ".exe"
 	}
-	cmd := exec.Command("go", "build", "--ldflags", ldflags, "-o", builddir+"/"+binname+"_"+strings.ToLower(GOOS)+"_"+strings.ToLower(GOARCH)+appendix, "-tags", tags)
+	cmd := exec.Command("go", "build", "--ldflags", ldflags, "-o", builddir+"/"+binname+"_"+strings.ToLower(GOOS)+"_"+strings.ToLower(GOARCH)+appendix, "-tags="+tags)
 	// Import env
 	out, err := exec.Command("printenv").Output()
 	if err != nil {
