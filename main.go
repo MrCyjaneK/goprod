@@ -45,7 +45,7 @@ func main() {
 		log.Fatal(err)
 	}
 	ndk := strings.ReplaceAll(*ndka, "~", usr.HomeDir)
-	os.RemoveAll(*builddir)
+	//os.RemoveAll(*builddir)
 	os.MkdirAll(*builddir, 0750)
 	log.Println(*combo)
 	for _, i := range strings.Split(*combo, ";") {
