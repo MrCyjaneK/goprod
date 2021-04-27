@@ -95,9 +95,8 @@ func Build(combo string, binname string, bindir string, debdir string, version s
 	cmd.Stdout = &outbuf
 	cmd.Stderr = &errbuf
 	err = cmd.Run()
-	log.Println("out:", outbuf.String(), "err:", errbuf.String())
 	if err != nil {
-		log.Fatal("err:", err)
+		log.Fatal("out:", outbuf.String(), "err:", errbuf.String())
 	}
 
 }
