@@ -55,10 +55,6 @@ func Build(combo string, binname string, bindir string, debdir string, version s
 		{
 			arch = "i386"
 		}
-	case "arm64":
-		{
-			arch = "aarch64"
-		}
 	}
 	cmd := exec.Command("checkinstall",
 		"--type=debian",
