@@ -11,6 +11,7 @@ import (
 
 	"git.mrcyjanek.net/mrcyjanek/goprod/compiler"
 	"git.mrcyjanek.net/mrcyjanek/goprod/debpackage"
+	"git.mrcyjanek.net/mrcyjanek/goprod/macpackage"
 )
 
 var (
@@ -51,7 +52,7 @@ func main() {
 	for _, i := range strings.Split(*combo, ";") {
 		spl := strings.Split(i, "/")
 		if len(spl) != 2 {
-			log.Fatal("Invalid " + i + " provided.")
+			log.Fatal("Invalid combo '" + i + "' provided.")
 		}
 		GOOS := spl[0]
 		log.Println("Compiling...")
@@ -59,6 +60,10 @@ func main() {
 		if GOOS == "linux" && *shouldpkg {
 			log.Println("Packaging...")
 			debpackage.Build(i, *binname, *builddir+"/bin", *builddir+"/deb", version)
+		}
+		if GOOS == "darwin" && *shouldpkg {
+			log.Println("Packaging...")
+			macpackage.Package(i, *binname, *builddir+"/bin", *builddir+"/mac", version)
 		}
 	}
 }
