@@ -15,6 +15,11 @@ type Intent struct {
 			Key   string `json:"key"`
 			Value string `json:"value"`
 		} `json:"extra"`
+		CustomComponent bool `json:"customcomponent"`
+		Component       struct {
+			PKG string `json:"pkg"`
+			CLS string `json:"cls"`
+		} `json:"component"`
 	} `json:"data"`
 }
 

@@ -1,4 +1,24 @@
-package x.x.@appname@
+package x.x.@
+import android.annotation.SuppressLint
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.os.Message
+import android.util.Log
+import android.webkit.WebChromeClient
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.appcompat.app.AppCompatActivity
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.File
+import java.io.InputStreamReader
+import java.util.concurrent.Executors
+
+
+appname@
 
 
 import android.annotation.SuppressLint
@@ -41,10 +61,10 @@ class MainActivity : AppCompatActivity() {
         webview.getSettings().setSupportMultipleWindows(true)
         webview.setWebChromeClient(object : WebChromeClient() {
             override fun onCreateWindow(
-                view: WebView,
-                dialog: Boolean,
-                userGesture: Boolean,
-                resultMsg: Message
+                    view: WebView,
+                    dialog: Boolean,
+                    userGesture: Boolean,
+                    resultMsg: Message
             ): Boolean {
                 val result = view.hitTestResult
                 val data = result.extra
@@ -66,7 +86,7 @@ class MainActivity : AppCompatActivity() {
                     .redirectErrorStream(true)
                     .start()
             val reader = BufferedReader(
-                InputStreamReader(process.inputStream)
+                    InputStreamReader(process.inputStream)
             )
             var line = reader.readLine()
             while(line != null) {
@@ -80,13 +100,16 @@ class MainActivity : AppCompatActivity() {
                         "android-intent" -> {
                             val uri = Uri.parse(data.getString("uri"))
                             val goprodintent = Intent(Intent.ACTION_VIEW)
-                            goprodintent.setPa
-import java.util.concurrent.Eckage(data.getString("package"))
-                            goprodintent.setData(uri)
+                            goprodintent.setPackage(data.getString("package"))
+                            goprodintent.data = uri
                             val extra = data.getJSONArray("extra")
                             for (i in 0 until extra.length()) {
                                 val item = extra.getJSONObject(i)
-                                goprodintent.putExtra(item.getString("key"),item.getString("value"))
+                                goprodintent.putExtra(item.getString("key"), item.getString("value"))
+                            }
+                            if (data.getBoolean("customcomponent")) {
+                                val compo = data.getJSONObject("component")
+                                goprodintent.component = ComponentName(compo.getString("pkg"), compo.getString("cls"))
                             }
                             startActivity(goprodintent)
                             Log.d("@appname", "activity started!")
