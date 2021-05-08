@@ -9,9 +9,10 @@ import (
 type Intent struct {
 	Type string `json:"type"`
 	Data struct {
-		URI     string `json:"uri"`
-		Package string `json:"package"`
-		Extra   []struct {
+		URI       string `json:"uri"`
+		Package   string `json:"package"`
+		ExtraUsed bool   `json:"extraused"`
+		Extra     []struct {
 			Key   string `json:"key"`
 			Value string `json:"value"`
 		} `json:"extra"`

@@ -1,4 +1,4 @@
-package x.x.@
+package x.x.@appname@
 import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
@@ -16,28 +16,6 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 import java.util.concurrent.Executors
-
-
-appname@
-
-
-import android.annotation.SuppressLint
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Bundle
-import android.os.Message
-import android.util.Log
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
-import androidx.appcompat.app.AppCompatActivity
-import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.File
-import java.io.InputStreamReader
-import java.util.concurrent.Executors
-
 
 
 class MainActivity : AppCompatActivity() {
@@ -102,10 +80,12 @@ class MainActivity : AppCompatActivity() {
                             val goprodintent = Intent(Intent.ACTION_VIEW)
                             goprodintent.setPackage(data.getString("package"))
                             goprodintent.data = uri
-                            val extra = data.getJSONArray("extra")
-                            for (i in 0 until extra.length()) {
-                                val item = extra.getJSONObject(i)
-                                goprodintent.putExtra(item.getString("key"), item.getString("value"))
+                            if (data.getBoolean("extraused")) {
+                                val extra = data.getJSONArray("extra")
+                                for (i in 0 until extra.length()) {
+                                    val item = extra.getJSONObject(i)
+                                    goprodintent.putExtra(item.getString("key"), item.getString("value"))
+                                }
                             }
                             if (data.getBoolean("customcomponent")) {
                                 val compo = data.getJSONObject("component")
