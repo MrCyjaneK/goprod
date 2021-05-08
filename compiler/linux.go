@@ -53,28 +53,28 @@ func Build(combo string, tags string, binname string, builddir string, ndk strin
 				{
 					arch = "aarch64"
 					cmd.Env = append(cmd.Env, "CC="+ndk+"/"+arch+"-linux-android21-clang")
-					cmd.Env = append(cmd.Env, "CXX="+ndk+"/"+arch+"-linux-android21-clang")
+					cmd.Env = append(cmd.Env, "CXX="+ndk+"/"+arch+"-linux-android21-clang++")
 					cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
 				}
 			case "arm":
 				{
 					arch = "armv7a"
 					cmd.Env = append(cmd.Env, "CC="+ndk+"/"+arch+"-linux-androideabi21-clang")
-					cmd.Env = append(cmd.Env, "CXX="+ndk+"/"+arch+"-linux-androideabi21-clang")
+					cmd.Env = append(cmd.Env, "CXX="+ndk+"/"+arch+"-linux-androideabi21-clang++")
 					cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
 				}
 			case "amd64":
 				{
 					arch = "x86_64"
 					cmd.Env = append(cmd.Env, "CC="+ndk+"/"+arch+"-linux-android21-clang")
-					cmd.Env = append(cmd.Env, "CXX="+ndk+"/"+arch+"-linux-android21-clang")
+					cmd.Env = append(cmd.Env, "CXX="+ndk+"/"+arch+"-linux-android21-clang++")
 					cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
 				}
 			case "386":
 				{
 					arch = "i686"
 					cmd.Env = append(cmd.Env, "CC="+ndk+"/"+arch+"-linux-android21-clang")
-					cmd.Env = append(cmd.Env, "CXX="+ndk+"/"+arch+"-linux-android21-clang")
+					cmd.Env = append(cmd.Env, "CXX="+ndk+"/"+arch+"-linux-android21-clang++")
 					cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
 				}
 			}

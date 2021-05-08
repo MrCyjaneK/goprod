@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"git.mrcyjanek.net/mrcyjanek/goprod/apkpackage"
 	"git.mrcyjanek.net/mrcyjanek/goprod/compiler"
 	"git.mrcyjanek.net/mrcyjanek/goprod/debpackage"
 	"git.mrcyjanek.net/mrcyjanek/goprod/macpackage"
@@ -22,7 +23,11 @@ var (
 	tags      = flag.String("tags", "goprod", "Tags that are passed to go build command")
 	versiona  = flag.String("version", "0.0.1", "Version of your program.")
 	ndka      = flag.String("ndk", "~/Android/Sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/linux-x86_64/bin/", "Path to android toolchain")
+	sdkpath   = flag.String("sdkpath", "~/Android/Sdk/", "Path to android Sdk")
 	shouldpkg = flag.Bool("package", true, "Should we create a package out of the binary?")
+	apkit     = flag.Bool("apkit", true, "Should I create android app?")
+	apport    = flag.String("appport", "8081", "What port should I open in native app?")
+	deltmp    = flag.Bool("deltmp", true, "Should I delete tmp files?")
 )
 var ndk string
 var version string
@@ -46,6 +51,7 @@ func main() {
 		log.Fatal(err)
 	}
 	ndk := strings.ReplaceAll(*ndka, "~", usr.HomeDir)
+	sdk := strings.ReplaceAll(*sdkpath, "~", usr.HomeDir)
 	//os.RemoveAll(*builddir)
 	os.MkdirAll(*builddir, 0750)
 	log.Println(*combo)
@@ -65,5 +71,8 @@ func main() {
 			log.Println("Packaging...")
 			macpackage.Package(i, *binname, *builddir+"/bin", *builddir+"/mac", version)
 		}
+	}
+	if *apkit {
+		apkpackage.Package(*binname, *builddir+"/bin", *builddir+"/apk", version, *apport, sdk, *deltmp)
 	}
 }
