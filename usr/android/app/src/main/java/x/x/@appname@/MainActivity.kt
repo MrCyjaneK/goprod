@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
                 Log.i("@appname@", "command:$line")
                 if (line.startsWith("goprod:")) {
                     val task = JSONObject(line.substring(7))
-                    Log.i("@appname@", "goprod action: $line")
+                    Log.i("@appname@", "goprod action: $task")
                     val type = task.getString("type")
                     val data = task.getJSONObject("data")
                     when (type) {
