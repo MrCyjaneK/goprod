@@ -33,6 +33,7 @@ var ndk string
 var version string
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Llongfile)
 	flag.Parse()
 	t := time.Now()
 	year := "" + strconv.Itoa(t.Year())
@@ -48,13 +49,14 @@ func main() {
 
 	usr, err := user.Current()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("user.Current():", err)
 	}
 	ndk := strings.ReplaceAll(*ndka, "~", usr.HomeDir)
 	sdk := strings.ReplaceAll(*sdkpath, "~", usr.HomeDir)
 	//os.RemoveAll(*builddir)
 	os.MkdirAll(*builddir, 0750)
 	log.Println(*combo)
+	androidused := false
 	for _, i := range strings.Split(*combo, ";") {
 		spl := strings.Split(i, "/")
 		if len(spl) != 2 {
@@ -71,8 +73,11 @@ func main() {
 			log.Println("Packaging...")
 			macpackage.Package(i, *binname, *builddir+"/bin", *builddir+"/mac", version)
 		}
+		if GOOS == "android" {
+			androidused = true
+		}
 	}
-	if *apkit {
+	if *apkit && androidused {
 		apkpackage.Package(*binname, *builddir+"/bin", *builddir+"/apk", version, *apport, sdk, *deltmp)
 	}
 }

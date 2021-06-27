@@ -1,0 +1,13 @@
+image: golang:buster
+before_script:
+  - echo -n -e "\n\ndeb http://deb.debian.org/debian buster-backports main\n" >> /etc/apt/sources.list
+  - apt update
+  - apt install checkinstall -y
+
+script:
+  - go run main.go -combo="linux/amd64" -builddir="build" -binname="goprod"
+
+after_success:
+  - rm $ARCHIVE/goprod_*
+  - cp build/bin/goprod* $ARCHIVE
+  - cp build/deb/goprod*.deb $APT

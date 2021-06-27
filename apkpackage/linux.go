@@ -13,6 +13,7 @@ import (
 )
 
 func Package(binname string, bindir string, apkdir string, version string, port string, sdkpath string, shoulddel bool) {
+	log.SetFlags(log.LstdFlags | log.Llongfile)
 	os.MkdirAll(apkdir, 0750)
 	workdir, err := ioutil.TempDir(os.TempDir(), "apkbuild")
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 )
 
 func Build(combo string, tags string, binname string, builddir string, ndk string, ldflags string) {
+	log.SetFlags(log.LstdFlags | log.Llongfile)
 	spl := strings.Split(combo, "/")
 	if len(spl) != 2 {
 		log.Fatal("Invalid " + combo + " provided.")

@@ -12,6 +12,7 @@ import (
 )
 
 func Build(combo string, binname string, bindir string, debdir string, version string) {
+	log.SetFlags(log.LstdFlags | log.Llongfile)
 	spl := strings.Split(combo, "/")
 	if len(spl) != 2 {
 		log.Fatal("Invalid " + combo + " provided.")
@@ -22,6 +23,7 @@ func Build(combo string, binname string, bindir string, debdir string, version s
 		log.Fatal("no")
 	}
 	out, err := exec.Command("printenv").Output()
+	envs := strings.Split(string(out), "\n")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,11 +37,14 @@ func Build(combo string, binname string, bindir string, debdir string, version s
 	}
 	email, err := exec.Command("git", "config", "user.email").Output()
 	if err != nil {
-		log.Fatal(err)
+		log.Println("WARN:", err)
+		email = []byte(os.Getenv("EMAIL"))
+		if string(email) == "" {
+			email = []byte("no-reply@example.com")
+		}
 	}
 	emails := string(email)
 	emails = strings.Split(emails, "\n")[0]
-	envs := strings.Split(string(out), "\n")
 	verout, err := exec.Command("git", "log", "-n", "1").Output()
 	if err != nil {
 		log.Fatal(err)

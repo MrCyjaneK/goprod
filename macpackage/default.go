@@ -9,6 +9,7 @@ import (
 )
 
 func Package(combo string, binname string, bindir string, zipdir string, version string) {
+	log.SetFlags(log.LstdFlags | log.Llongfile)
 	spl := strings.Split(combo, "/")
 	if len(spl) != 2 {
 		log.Fatal("Invalid " + combo + " provided.")
