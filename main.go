@@ -1,10 +1,17 @@
 package main
 
 import (
+	"archive/zip"
 	"flag"
+	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"os/user"
+	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -16,13 +23,14 @@ import (
 )
 
 var (
-	combo     = flag.String("combo", "linux/arm;linux/386;linux/arm64;linux/amd64", "Combo that I should serve")
-	builddir  = flag.String("builddir", "build", "Where should the files get saved.")
-	ldflags   = flag.String("ldflags", "", "Things to get passwd by with --ldflags")
-	binname   = flag.String("binname", "helloworld", "What is the program name?")
-	tags      = flag.String("tags", "goprod", "Tags that are passed to go build command")
-	versiona  = flag.String("version", "0.0.1", "Version of your program.")
-	ndka      = flag.String("ndk", "~/Android/Sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/linux-x86_64/bin/", "Path to android toolchain")
+	combo    = flag.String("combo", "linux/arm;linux/386;linux/arm64;linux/amd64", "Combo that I should serve")
+	builddir = flag.String("builddir", "build", "Where should the files get saved.")
+	ldflags  = flag.String("ldflags", "", "Things to get passwd by with --ldflags")
+	binname  = flag.String("binname", "helloworld", "What is the program name?")
+	tags     = flag.String("tags", "goprod", "Tags that are passed to go build command")
+	versiona = flag.String("version", "0.0.1", "Version of your program.")
+	//TODO: Do **NOT** hardcode the path here, bruh.
+	ndka      = flag.String("ndk", "~/Android/Sdk/ndk/android-ndk-r22b/toolchains/llvm/prebuilt/linux-x86_64/bin/", "Path to android toolchain")
 	sdkpath   = flag.String("sdkpath", "~/Android/Sdk/", "Path to android Sdk")
 	shouldpkg = flag.Bool("package", true, "Should we create a package out of the binary?")
 	apkit     = flag.Bool("apkit", true, "Should I create android app?")
@@ -30,9 +38,11 @@ var (
 	deltmp    = flag.Bool("deltmp", true, "Should I delete tmp files?")
 )
 var ndk string
+var sdk string
 var version string
 
 func main() {
+
 	log.SetFlags(log.LstdFlags | log.Llongfile)
 	flag.Parse()
 	t := time.Now()
@@ -47,12 +57,23 @@ func main() {
 	minute = minute[len(minute)-2:]
 	version = *versiona + "-" + year + month + day + hour + minute
 
+	if len(os.Args) == 2 {
+		switch os.Args[1] {
+		case "ndk-update":
+			{
+				updateNdk()
+				return
+			}
+		}
+	}
+
 	usr, err := user.Current()
 	if err != nil {
 		log.Fatal("user.Current():", err)
 	}
-	ndk := strings.ReplaceAll(*ndka, "~", usr.HomeDir)
-	sdk := strings.ReplaceAll(*sdkpath, "~", usr.HomeDir)
+	ndk = strings.ReplaceAll(*ndka, "~", usr.HomeDir)
+	sdk = strings.ReplaceAll(*sdkpath, "~", usr.HomeDir)
+
 	//os.RemoveAll(*builddir)
 	os.MkdirAll(*builddir, 0750)
 	log.Println(*combo)
@@ -80,4 +101,139 @@ func main() {
 	if *apkit && androidused {
 		apkpackage.Package(*binname, *builddir+"/bin", *builddir+"/apk", version, *apport, sdk, *deltmp)
 	}
+}
+
+func updateNdk() {
+	//#!/bin/bash
+	//mkdir -p ~/Android/Sdk/ndk/
+	log.Println("creating directory")
+	os.MkdirAll(path.Join(sdk, "/ndk"), 0755)
+	//latest=$(wget --quiet https://developer.android.com/ndk/downloads/ -O - | tr '>' ">\n" | grep "linux-x86_64.zip" | grep href | tr '"' "\n" | head -2 | tail -1)
+	log.Println("fetching latest version number")
+	resp, err := http.Get("https://developer.android.com/ndk/downloads/")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	str := strings.Split(string(body), ">")
+	str = grep("linux-x86_64.zip", str)
+	str = grep("href", str)
+	str = strings.Split(strings.Join(str, "\""), "\"")
+	link := str[1]
+	b, err := os.ReadFile(path.Join(sdk, "version"))
+	if err != nil || string(b) == link {
+		log.Println("current version", string(b), "google's version:", link)
+		log.Println("downloading")
+		resp, err := http.Get(link)
+		if err != nil {
+			log.Fatal(err)
+		}
+		out, err := os.Create("/tmp/ndk.zip")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer out.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println("writing to file")
+		io.Copy(out, resp.Body)
+		log.Println("unzipping")
+		err = Unzip("/tmp/ndk.zip", path.Join(sdk, "/ndk"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println("cleaning up")
+		os.Remove("/tmp/ndk.zip")
+		os.WriteFile(path.Join(sdk, "version"), []byte(link), 0755)
+		return
+	}
+	//if [[ "X$(cat ~/Android/Sdk/version)" == "X$latest" ]];
+	//then
+	//    echo "No need to update ndk"
+	//    exit 0
+	//fi
+	//set -e
+	//wget "$latest" -O ndk.zip
+	//rm -rf android-ndk-*
+	//unzip ndk.zip &>/dev/null
+	//rm ndk.zip
+	//echo "$latest" > ~/Android/Sdk/version
+}
+func grep(search string, in []string) []string {
+	var resp []string
+	for i := range in {
+		if strings.Contains(in[i], search) {
+			resp = append(resp, in[i])
+		}
+	}
+	return resp
+}
+
+func Unzip(src, dest string) error {
+	r, err := zip.OpenReader(src)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := r.Close(); err != nil {
+			panic(err)
+		}
+	}()
+
+	os.MkdirAll(dest, 0755)
+
+	// Closure to address file descriptors issue with all the deferred .Close() methods
+	extractAndWriteFile := func(f *zip.File) error {
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if err := rc.Close(); err != nil {
+				panic(err)
+			}
+		}()
+
+		path := filepath.Join(dest, f.Name)
+
+		// Check for ZipSlip (Directory traversal)
+		if !strings.HasPrefix(path, filepath.Clean(dest)+string(os.PathSeparator)) {
+			return fmt.Errorf("illegal file path: %s", path)
+		}
+
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(path, f.Mode())
+		} else {
+			os.MkdirAll(filepath.Dir(path), f.Mode())
+			f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				if err := f.Close(); err != nil {
+					panic(err)
+				}
+			}()
+
+			_, err = io.Copy(f, rc)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	for _, f := range r.File {
+		err := extractAndWriteFile(f)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

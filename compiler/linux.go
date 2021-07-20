@@ -104,6 +104,13 @@ func Build(combo string, tags string, binname string, builddir string, ndk strin
 					cmd.Env = append(cmd.Env, "HOST=i686-linux-gnu")
 					cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
 				}
+			case "amd64":
+				{
+					cmd.Env = append(cmd.Env, "CC=x86_64-linux-gnu-gcc")
+					cmd.Env = append(cmd.Env, "CXX=x86_64-linux-gnu-g++")
+					cmd.Env = append(cmd.Env, "HOST=x86_64-linux-gnu")
+					cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
+				}
 			}
 		}
 	case "windows":
@@ -118,8 +125,8 @@ func Build(combo string, tags string, binname string, builddir string, ndk strin
 				}
 			case "386":
 				{
-					cmd.Env = append(cmd.Env, "CC=x86_64-w64-mingw32-gcc")
-					cmd.Env = append(cmd.Env, "CXX=x86_64-w64-mingw32-g++")
+					cmd.Env = append(cmd.Env, "CC=i686-w64-mingw32-gcc")
+					cmd.Env = append(cmd.Env, "CXX=i686-w64-mingw32-g++")
 					cmd.Env = append(cmd.Env, "HOST=x86_64-w64-mingw32")
 					cmd.Env = append(cmd.Env, "CGO_ENABLED=1")
 				}

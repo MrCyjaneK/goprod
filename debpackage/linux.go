@@ -35,6 +35,7 @@ func Build(combo string, binname string, bindir string, debdir string, version s
 	if err != nil {
 		log.Fatal(err)
 	}
+	//TODO: remove `exec` and use go-git?
 	email, err := exec.Command("git", "config", "user.email").Output()
 	if err != nil {
 		log.Println("WARN:", err)
@@ -93,8 +94,6 @@ func Build(combo string, binname string, bindir string, debdir string, version s
 			log.Fatal(err)
 		}
 	}
-	//t := time.Now()
-	//log.Fatal("\n", t.Year(), int(t.Month()), t.Day(), t.Hour(), t.Minute(), t.Second())
 
 	var outbuf, errbuf bytes.Buffer
 	cmd.Stdout = &outbuf
