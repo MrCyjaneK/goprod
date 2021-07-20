@@ -5,7 +5,7 @@ GoProd is a simple tool that let you package your Golang app in seconds!
 ## Usage
 
 ```bash
-$ goprod golang build # This fill build for your host target ONLY.
+$ goprod
 $ goprod golang build \
      -combo="linux/arm;linux/i386;linux/arm64;linux/amd64;windows/amd64;windows/i386" \
      -builddir="build" \
@@ -14,7 +14,9 @@ $ goprod golang build \
 
 # Installation
 
-You can either run `go build` inside of this project, `go get` it, or install it [from my repo](https://git.mrcyjanek.net/mrcyjanek/mrcyjanekrepo):
+To install from source: `go run main.go -binname="goprod" -combo="$(go env GOOS)/$(go env GOARCH) && apt install ./build/deb/goprod*.deb"`
+
+To get a prebuild binary:
 
 ```bash
 # wget 'https://static.mrcyjanek.net/laminarci/apt-repository/cyjan_repo/mrcyjanek-repo-latest.deb' && \
@@ -26,3 +28,7 @@ You can either run `go build` inside of this project, `go get` it, or install it
 ```bash
 # apt install goprod
 ```
+
+You can also use it directly in docker, `mrcyjanek/goprod:latest` this image is updated on each commit to this repo, and contain gcc/g++ for amd64,aaarch64,arm and i386 linux and windows, i686 and x64
+
+`goprod` is accessible there as a command, together with everything configured, except for your email - you may want to do `git config user.email your-email@selfhostbtw.onion` and `git config user.name "Your Name"`, because this name and email is used to package debian package.
