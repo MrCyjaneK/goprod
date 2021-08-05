@@ -62,7 +62,6 @@ func main() {
 	}
 	ndk = strings.ReplaceAll(*ndka, "~", usr.HomeDir)
 	sdk = strings.ReplaceAll(*sdkpath, "~", usr.HomeDir)
-	os.Exit(0)
 	if len(os.Args) == 2 {
 		switch os.Args[1] {
 		case "ndk-update":
