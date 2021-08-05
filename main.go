@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/user"
 	"path"
 	"path/filepath"
@@ -42,7 +43,6 @@ var sdk string
 var version string
 
 func main() {
-
 	log.SetFlags(log.LstdFlags | log.Llongfile)
 	flag.Parse()
 	t := time.Now()
@@ -62,11 +62,17 @@ func main() {
 	}
 	ndk = strings.ReplaceAll(*ndka, "~", usr.HomeDir)
 	sdk = strings.ReplaceAll(*sdkpath, "~", usr.HomeDir)
+	os.Exit(0)
 	if len(os.Args) == 2 {
 		switch os.Args[1] {
 		case "ndk-update":
 			{
 				updateNdk()
+				return
+			}
+		case "accept-license":
+			{
+				acceptLicense()
 				return
 			}
 		}
@@ -101,14 +107,33 @@ func main() {
 	}
 }
 
+func acceptLicense() {
+	cmd := exec.Command(sdk+"/cmdline-tools/bin/sdkmanager", "--sdk_root="+sdk, "--licenses")
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		fmt.Println(err) //replace with logger, or anything you want
+	}
+	go func() {
+		for {
+			time.Sleep(time.Second)
+			_, err = io.WriteString(stdin, "y\n")
+			if err != nil {
+				log.Println(err)
+				return
+			}
+		}
+	}()
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err = cmd.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stdin.Close()
+}
+
 func updateNdk() {
-	//#!/bin/bash
-	//mkdir -p ~/Android/Sdk/ndk/
-	log.Println("creating directory", path.Join(sdk, "/ndk"))
-	os.MkdirAll(path.Join(sdk, "/ndk"), 0755)
-	//latest=$(wget --quiet https://developer.android.com/ndk/downloads/ -O - | tr '>' ">\n" | grep "linux-x86_64.zip" | grep href | tr '"' "\n" | head -2 | tail -1)
-	log.Println("fetching latest version number")
-	resp, err := http.Get("https://developer.android.com/ndk/downloads/")
+	resp, err := http.Get("https://developer.android.com/studio")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -117,12 +142,59 @@ func updateNdk() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	str := strings.Split(string(body), ">")
-	str = grep("linux-x86_64.zip", str)
+	sdkstra := strings.Split(strings.ReplaceAll(string(body), "\"", ">"), ">")
+	sdkstr := grep(".zip", sdkstra)
+	sdkstr = grep("commandlinetools-linux", sdkstr)
+	link := sdkstr[1]
+	b, err := os.ReadFile(path.Join(sdk, "version-sdk"))
+	if err != nil || string(b) == link {
+		log.Println("current version", string(b), "google's version:", link)
+		log.Println("downloading")
+		resp, err := http.Get(link)
+		if err != nil {
+			log.Fatal(err)
+		}
+		out, err := os.Create("/tmp/sdk.zip")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer out.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println("writing to file")
+		io.Copy(out, resp.Body)
+		log.Println("unzipping")
+		err = Unzip("/tmp/sdk.zip", path.Join(sdk))
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println("cleaning up")
+		os.Remove("/tmp/sdk.zip")
+		os.WriteFile(path.Join(sdk, "version-sdk"), []byte(link), 0755)
+	}
+
+	//#!/bin/bash
+	//mkdir -p ~/Android/Sdk/ndk/
+	log.Println("creating directory", path.Join(sdk, "/ndk"))
+	os.MkdirAll(path.Join(sdk, "/ndk"), 0755)
+	//latest=$(wget --quiet https://developer.android.com/ndk/downloads/ -O - | tr '>' ">\n" | grep "linux-x86_64.zip" | grep href | tr '"' "\n" | head -2 | tail -1)
+	log.Println("fetching latest version number")
+	resp, err = http.Get("https://developer.android.com/ndk/downloads/")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	body, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	stra := strings.Split(string(body), ">")
+	str := grep("linux-x86_64.zip", stra)
 	str = grep("href", str)
 	str = strings.Split(strings.Join(str, "\""), "\"")
-	link := str[1]
-	b, err := os.ReadFile(path.Join(sdk, "version"))
+	link = str[1]
+	b, err = os.ReadFile(path.Join(sdk, "version-ndk"))
 	if err != nil || string(b) == link {
 		log.Println("current version", string(b), "google's version:", link)
 		log.Println("downloading")
@@ -147,20 +219,9 @@ func updateNdk() {
 		}
 		log.Println("cleaning up")
 		os.Remove("/tmp/ndk.zip")
-		os.WriteFile(path.Join(sdk, "version"), []byte(link), 0755)
-		return
+		os.WriteFile(path.Join(sdk, "version-ndk"), []byte(link), 0755)
 	}
-	//if [[ "X$(cat ~/Android/Sdk/version)" == "X$latest" ]];
-	//then
-	//    echo "No need to update ndk"
-	//    exit 0
-	//fi
-	//set -e
-	//wget "$latest" -O ndk.zip
-	//rm -rf android-ndk-*
-	//unzip ndk.zip &>/dev/null
-	//rm ndk.zip
-	//echo "$latest" > ~/Android/Sdk/version
+	// Now imma accept license real quick
 }
 func grep(search string, in []string) []string {
 	var resp []string
