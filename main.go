@@ -56,7 +56,12 @@ func main() {
 	minute := "0" + strconv.Itoa(t.Minute())
 	minute = minute[len(minute)-2:]
 	version = *versiona + "-" + year + month + day + hour + minute
-
+	usr, err := user.Current()
+	if err != nil {
+		log.Fatal("user.Current():", err)
+	}
+	ndk = strings.ReplaceAll(*ndka, "~", usr.HomeDir)
+	sdk = strings.ReplaceAll(*sdkpath, "~", usr.HomeDir)
 	if len(os.Args) == 2 {
 		switch os.Args[1] {
 		case "ndk-update":
@@ -66,13 +71,6 @@ func main() {
 			}
 		}
 	}
-
-	usr, err := user.Current()
-	if err != nil {
-		log.Fatal("user.Current():", err)
-	}
-	ndk = strings.ReplaceAll(*ndka, "~", usr.HomeDir)
-	sdk = strings.ReplaceAll(*sdkpath, "~", usr.HomeDir)
 
 	//os.RemoveAll(*builddir)
 	os.MkdirAll(*builddir, 0750)
@@ -106,7 +104,7 @@ func main() {
 func updateNdk() {
 	//#!/bin/bash
 	//mkdir -p ~/Android/Sdk/ndk/
-	log.Println("creating directory")
+	log.Println("creating directory", path.Join(sdk, "/ndk"))
 	os.MkdirAll(path.Join(sdk, "/ndk"), 0755)
 	//latest=$(wget --quiet https://developer.android.com/ndk/downloads/ -O - | tr '>' ">\n" | grep "linux-x86_64.zip" | grep href | tr '"' "\n" | head -2 | tail -1)
 	log.Println("fetching latest version number")
