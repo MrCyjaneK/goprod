@@ -53,6 +53,7 @@ func Build(combo string, tags string, binname string, builddir string, ndk strin
 	cmd.Env = append(cmd.Env, "GOOS="+GOOS)
 	cmd.Env = append(cmd.Env, "GOARCH="+GOARCH)
 	cmd.Env = append(cmd.Env, "CGO_ENABLED=0")
+	cmd.Env = append(cmd.Env, "BINNAME="+binname)
 	switch GOOS {
 	case "android":
 		{
