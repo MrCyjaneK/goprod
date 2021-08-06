@@ -6,8 +6,5 @@ before_script:
 
 script:
   - go run main.go -combo="linux/amd64" -builddir="build" -binname="goprod"
-
-after_success:
-  - rm $ARCHIVE/goprod_*
-  - cp build/bin/goprod* $ARCHIVE
-  - cp build/deb/goprod*.deb $APT
+  - cp build/bin/goprod* /archive
+  - cp build/deb/goprod*.deb /apt
