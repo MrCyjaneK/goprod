@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func Build(combo string, tags string, binname string, builddir string, ndk string, ldflags string) {
+func Build(combo string, tags string, binname string, builddir string, ndk string, ldflags string, buildcmd []string) {
 	log.SetFlags(log.LstdFlags | log.Llongfile)
 	spl := strings.Split(combo, "/")
 	if len(spl) != 2 {
@@ -22,7 +22,15 @@ func Build(combo string, tags string, binname string, builddir string, ndk strin
 	if GOOS == "windows" {
 		appendix = ".exe"
 	}
-	cmd := exec.Command("go", "build", "--ldflags", ldflags, "-o", builddir+"/"+binname+"_"+strings.ToLower(GOOS)+"_"+strings.ToLower(GOARCH)+appendix, "-tags="+tags)
+	var cmd *exec.Cmd
+	if len(buildcmd) == 0 {
+		cmd = exec.Command("go", "build", "--ldflags", ldflags, "-o", builddir+"/"+binname+"_"+strings.ToLower(GOOS)+"_"+strings.ToLower(GOARCH)+appendix, "-tags="+tags)
+	} else {
+		cmd = exec.Command(buildcmd[0])
+		if len(buildcmd) > 1 {
+			cmd.Args = buildcmd
+		}
+	}
 	// Import env
 	out, err := exec.Command("printenv").Output()
 	if err != nil {

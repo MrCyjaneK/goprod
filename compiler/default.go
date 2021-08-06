@@ -7,6 +7,6 @@ import (
 	"runtime"
 )
 
-func Build(combo string, tags string, binname string, builddir string, ndk string, ldflags string, shoulddel bool) {
+func Build(combo string, tags string, binname string, builddir string, ndk string, ldflags string, buildcmd []string) {
 	log.Fatal(runtime.GOOS, runtime.GOARCH, "")
 }

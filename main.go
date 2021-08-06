@@ -21,6 +21,7 @@ import (
 	"git.mrcyjanek.net/mrcyjanek/goprod/compiler"
 	"git.mrcyjanek.net/mrcyjanek/goprod/debpackage"
 	"git.mrcyjanek.net/mrcyjanek/goprod/macpackage"
+	gosh "git.mrcyjanek.net/mrcyjanek/gosh/_core"
 )
 
 var (
@@ -37,6 +38,7 @@ var (
 	apkit     = flag.Bool("apkit", true, "Should I create android app?")
 	apport    = flag.String("appport", "8081", "What port should I open in native app?")
 	deltmp    = flag.Bool("deltmp", true, "Should I delete tmp files?")
+	buildcmd  = flag.String("buildcmd", "", "What command should be used to build the program? Defaults to 'go build`")
 )
 var ndk string
 var sdk string
@@ -88,7 +90,11 @@ func main() {
 		}
 		GOOS := spl[0]
 		log.Println("Compiling...")
-		compiler.Build(i, *tags, *binname, *builddir+"/bin", ndk, *ldflags)
+		buildargs, err := gosh.Split(*buildcmd)
+		if err != nil {
+			log.Fatal("Unable to parse command: '"+*buildcmd+"'", err)
+		}
+		compiler.Build(i, *tags, *binname, *builddir+"/bin", ndk, *ldflags, buildargs)
 		if GOOS == "linux" && *shouldpkg {
 			log.Println("Packaging...")
 			debpackage.Build(i, *binname, *builddir+"/bin", *builddir+"/deb", version)
