@@ -46,11 +46,6 @@ func Build(combo string, binname string, bindir string, debdir string, version s
 	}
 	emails := string(email)
 	emails = strings.Split(emails, "\n")[0]
-	verout, err := exec.Command("git", "show", "-s", "--date=format:'%Y%m%d%H%M'", "--format=%cd").Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-	commit := strings.Split(string(verout), "\n")[0]
 	arch := "amd64"
 	switch GOARCH {
 	case "arm":
@@ -71,7 +66,7 @@ func Build(combo string, binname string, bindir string, debdir string, version s
 		"--install=no",
 		"--default",
 		"--pkgname="+binname,
-		"--pkgversion="+version+,
+		"--pkgversion="+version,
 		"--arch="+arch,
 		"--pakdir="+debdir,
 		"--maintainer="+emails,
