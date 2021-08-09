@@ -6,6 +6,9 @@ RUN apt install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
 RUN apt install -y gcc-i686-linux-gnu g++-i686-linux-gnu
 RUN apt install -y gcc g++
 
+COPY usr/golang/stdreq /a
+RUN goprod -combo="linux/amd64;linux/386;linux/arm;linux/arm64"
+RUN rm -rf /a
 COPY . /go/src/git.mrcyjanek.net/goprod/
 WORKDIR /go/src/git.mrcyjanek.net/goprod/
 RUN go run main.go -combo="linux/amd64" -builddir="build" -binname="goprod"

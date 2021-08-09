@@ -3,6 +3,10 @@ FROM mrcyjanek/goprod:nodejs
 RUN apt install -y gcc-mingw-w64-x86-64-win32 g++-mingw-w64-x86-64-win32
 RUN apt install -y gcc-mingw-w64-i686-win32 g++-mingw-w64-i686-win32
 
+COPY usr/golang/stdreq /a
+RUN goprod -combo="windows/amd64;windows/386"
+RUN rm -rf /a
+
 COPY . /go/src/git.mrcyjanek.net/goprod/
 WORKDIR /go/src/git.mrcyjanek.net/goprod/
 RUN go run main.go -combo="linux/amd64" -builddir="build" -binname="goprod"
