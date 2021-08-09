@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func Package(binname string, bindir string, apkdir string, version string, port string, sdkpath string, shoulddel bool) {
+func Package(binname string, bindir string, apkdir string, version string, appurl string, sdkpath string, shoulddel bool) {
 	log.SetFlags(log.LstdFlags | log.Llongfile)
 	os.MkdirAll(apkdir, 0750)
 	workdir, err := ioutil.TempDir(os.TempDir(), "apkbuild")
@@ -28,13 +28,14 @@ func Package(binname string, bindir string, apkdir string, version string, port 
 	log.Println("Building apk in " + workdir)
 	copyDir("/usr/share/goprod/android", workdir)
 	log.Println("Replacing stuff.")
-	fileReplace(workdir+"/app/src/main/java/x/x/@appname@/MainActivity.kt", "@port@", port)
+	fileReplace(workdir+"/app/src/main/java/x/x/@appname@/MainActivity.kt", "@appurl@", appurl)
 	fileReplace(workdir+"/app/build.gradle", "@version@", version)
 	fileReplace(workdir+"/settings.gradle", "@appname@", binname)
 	fileReplace(workdir+"/app/build.gradle", "@appname@", binname)
 	fileReplace(workdir+"/app/src/androidTest/java/x/x/@appname@/ExampleInstrumentedTest.kt", "@appname@", binname)
 	fileReplace(workdir+"/app/src/main/AndroidManifest.xml", "@appname@", binname)
 	fileReplace(workdir+"/app/src/main/java/x/x/@appname@/MainActivity.kt", "@appname@", binname)
+	fileReplace(workdir+"/app/src/main/java/x/x/@appname@/MainReceiver.kt", "@appname@", binname)
 	fileReplace(workdir+"/app/src/main/res/values/strings.xml", "@appname@", binname)
 	fileReplace(workdir+"/app/src/main/res/values/themes.xml", "@appname@", binname)
 	fileReplace(workdir+"/app/src/main/res/values/themes.xml", "@appname@", binname)
@@ -93,7 +94,8 @@ func copyFile(src string, dst string) {
 func fileReplace(filepath string, search string, replace string) {
 	input, err := ioutil.ReadFile(filepath)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 
 	target := strings.ReplaceAll(string(input), search, replace)

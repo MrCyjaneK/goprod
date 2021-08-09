@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
                 return false
             }
         })
-        webview.loadUrl("data:text/html,<meta http-equiv=\"Refresh\" content=\"1; url='http://127.0.0.1:@port@'\" />")
+        webview.loadUrl("data:text/html,<meta http-equiv=\"Refresh\" content=\"0; url='@appurl@'\" />")
         rund()
     }
     private fun exec(command: String, params: String): String {

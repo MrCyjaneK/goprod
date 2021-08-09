@@ -34,3 +34,21 @@ func CallIntent(i Intent) error {
 	fmt.Println("goprod:" + string(b))
 	return nil
 }
+
+type Toast struct {
+	Type string `json:"type"`
+	Data struct {
+		Text string `json:"text"`
+	} `json:"data"`
+}
+
+func SendToast(t Toast) error {
+	b, err := json.Marshal(t)
+	if err != nil {
+		log.Println("goporod/android.go CallIntent()", err)
+		return err
+	}
+	fmt.Println(string(b))
+	fmt.Println("goprod:" + string(b))
+	return nil
+}

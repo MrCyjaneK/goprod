@@ -36,7 +36,7 @@ var (
 	sdkpath   = flag.String("sdkpath", "~/Android/Sdk/", "Path to android Sdk")
 	shouldpkg = flag.Bool("package", true, "Should we create a package out of the binary?")
 	apkit     = flag.Bool("apkit", true, "Should I create android app?")
-	apport    = flag.String("appport", "8081", "What port should I open in native app?")
+	appurl    = flag.String("appurl", "http://127.0.0.1:8081/", "What url should I open in native app?")
 	deltmp    = flag.Bool("deltmp", true, "Should I delete tmp files?")
 	buildcmd  = flag.String("buildcmd", "", "What command should be used to build the program? Defaults to 'go build`")
 )
@@ -108,7 +108,7 @@ func main() {
 		}
 	}
 	if *apkit && androidused {
-		apkpackage.Package(*binname, *builddir+"/bin", *builddir+"/apk", version, *apport, sdk, *deltmp)
+		apkpackage.Package(*binname, *builddir+"/bin", *builddir+"/apk", version, *appurl, sdk, *deltmp)
 	}
 }
 

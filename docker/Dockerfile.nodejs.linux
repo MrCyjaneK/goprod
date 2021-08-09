@@ -1,0 +1,12 @@
+FROM mrcyjanek/goprod:nodejs
+
+RUN apt install -y checkinstall
+RUN apt install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+RUN apt install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+RUN apt install -y gcc-i686-linux-gnu g++-i686-linux-gnu
+RUN apt install -y gcc g++
+
+COPY . /go/src/git.mrcyjanek.net/goprod/
+WORKDIR /go/src/git.mrcyjanek.net/goprod/
+RUN go run main.go -combo="linux/amd64" -builddir="build" -binname="goprod"
+RUN apt install ./build/deb/goprod*.deb -y

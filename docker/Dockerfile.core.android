@@ -1,0 +1,17 @@
+FROM mrcyjanek/goprod:core
+
+RUN apt install -y default-jre
+WORKDIR /go
+RUN goprod ndk-update
+RUN goprod accept-license
+COPY usr/android /a 
+WORKDIR /a
+# This command wil for sure fail - but that doesn't matter - It's just required to
+#download the dependencies
+RUN ANDROID_SDK_ROOT=/root/Android/Sdk/ ./gradlew build || true
+RUN rm -rf /a
+RUN echo ANDROID_SDK_ROOT=/root/Android/Sdk > /etc/environment
+COPY . /go/src/git.mrcyjanek.net/goprod/
+WORKDIR /go/src/git.mrcyjanek.net/goprod/
+RUN go run main.go -combo="linux/amd64" -builddir="build" -binname="goprod"
+RUN apt install ./build/deb/goprod*.deb -y

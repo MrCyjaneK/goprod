@@ -1,0 +1,9 @@
+FROM mrcyjanek/goprod:core
+
+RUN apt install -y gcc-mingw-w64-x86-64-win32 g++-mingw-w64-x86-64-win32
+RUN apt install -y gcc-mingw-w64-i686-win32 g++-mingw-w64-i686-win32
+
+COPY . /go/src/git.mrcyjanek.net/goprod/
+WORKDIR /go/src/git.mrcyjanek.net/goprod/
+RUN go run main.go -combo="linux/amd64" -builddir="build" -binname="goprod"
+RUN apt install ./build/deb/goprod*.deb -y

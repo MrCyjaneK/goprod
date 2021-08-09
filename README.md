@@ -25,20 +25,15 @@ To get a prebuild binary:
   apt install goprod
 ```
 
-### Docker
-
-You can also use it directly in docker, `mrcyjanek/goprod:latest` this image is updated on each commit to this repo, and contain gcc/g++ for amd64,aaarch64,arm and i386 linux and windows, i686 and x64
-
-
 ### Advanced Usage
 
 Goprod exist because I want to package my programs with ease, and I expect thhem to 'just work', I don't care about proper debian packaging (well I do - but not here.). Here are all possible options
 
 You can build and package for:
 
- - [x] Android 
+ - [x] Android (.apk)
  - [x] Debian (.deb)
- - [x] MacOS (partial)
+ - [x] MacOS (partial, .zip)
  - [x] Windows (aka portable exe)
  - [ ] Ubuntu Touch (.click)
  - [ ] Flatpak
@@ -48,7 +43,7 @@ I generally recommend you using the docker image if you have some CI/CD solution
 
 ## Preparing
 
-You need to install depedencies, for debian check `Dockerfile` for an up-to-date list of **all** depedencies (you usually don't need all of them, unless you deploy from the machine on which you work.)
+You need to install depedencies, for debian check `docker/` for an up-to-date list of **all** depedencies (you usually don't need all of them, unless you deploy from the machine on which you work.)
 
 So list of required things:
 
@@ -63,3 +58,25 @@ So list of required things:
      - To package for android `default-jre` is required.
 
 `goprod` is accessible there as a command, together with everything configured, except for your email - you may want to do `git config user.email your-email@selfhostbtw.onion` and `git config user.name "Your Name"`, because this name and email is used to package debian package.
+
+### A word about docker
+
+There are a couple of docker images available, and if you feel bad about using the public docker registry - `make docker`:
+
+ - `mrcyjanek/goprod:core`
+   This is the smallest image - it only contain `goprod` executable, and (sometimes) not it's up to date version (it's a cached version from my apt, in the other versions it is getting updated by compiling what's in this repo). It's used to build other docker images.
+   It's fine to use it for `darwin` builds afaik, but I didn't really test it.
+ - `mrcyjanek/goprod:nodejs`
+   This is like `core` but with nodejs installed. Why? Sometimes you may want to use some nodejs thing to build frontend, that's why.
+ - `mrcyjanek/goprod:core-android`
+   This image contain things to build stuff for android, that include android ndk, sdk, java and an emulator.
+ - `mrcyjanek/goprod:nodejs-android`
+   Same as above but with nodejs
+ - `mrcyjanek/goprod:core-linux`
+   This image contain all the things required for linux (cross) compiling and packaging.
+ - `mrcyjanek/goprod:nodejs-linux`
+   Same as above but with nodejs
+ - `mrcyjanek/goprod:core-windows`
+   This image contain 32 and 64bit mingw for cross compiling.
+ - `mrcyjanek/goprod:nodejs-windows`
+   same as above but with nodejs

@@ -2,9 +2,11 @@ image: golang:buster
 before_script:
   - echo -n -e "\n\ndeb http://deb.debian.org/debian buster-backports main\n" >> /etc/apt/sources.list
   - apt update
-  - apt install checkinstall -y
+  - apt install checkinstall docker.io -y
 
 script:
   - go run main.go -combo="linux/amd64" -builddir="build" -binname="goprod"
   - cp build/bin/goprod* /archive
   - cp build/deb/goprod*.deb /apt
+  - make docker
+  - make docker_push
