@@ -94,7 +94,6 @@ func main() {
 	//os.RemoveAll(*builddir)
 	os.MkdirAll(*builddir, 0750)
 	log.Println(*combo)
-	androidused := false
 	for _, i := range strings.Split(*combo, ";") {
 		spl := strings.Split(i, "/")
 		if len(spl) != 2 {
@@ -119,11 +118,8 @@ func main() {
 			log.Println("Packaging...")
 			macpackage.Package(i, *binname, *builddir+"/bin", *builddir+"/mac", version)
 		}
-		if GOOS == "android" {
-			androidused = true
-		}
-		if *apkit && androidused {
-			apkpackage.Package(*binname, *builddir+"/bin", *builddir+"/apk", version, *appurl, sdk, *deltmp, *apktemplate)
+		if *apkit {
+			apkpackage.Package(*binname, *builddir+"/bin", *builddir+"/apk", version, *appurl, sdk, *deltmp, *apktemplate, GOARCH)
 		}
 	}
 }

@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func Package(binname string, bindir string, apkdir string, version string, appurl string, sdkpath string, shoulddel bool, apktemplate string) {
+func Package(binname string, bindir string, apkdir string, version string, appurl string, sdkpath string, shoulddel bool, apktemplate string, GOARCH string) {
 	log.SetFlags(log.LstdFlags | log.Llongfile)
 	os.MkdirAll(apkdir, 0750)
 	workdir, err := ioutil.TempDir(os.TempDir(), "apkbuild")
@@ -46,10 +46,18 @@ func Package(binname string, bindir string, apkdir string, version string, appur
 	os.Rename(workdir+"/app/src/main/java/x/x/@appname@", workdir+"/app/src/main/java/x/x/"+binname)
 	os.Rename(workdir+"/app/src/test/java/x/x/@appname@", workdir+"/app/src/test/java/x/x/"+binname)
 	log.Println("Copying binaries.")
-	copyFile(bindir+"/"+binname+"_android_amd64", workdir+"/app/src/main/resources/lib/x86_64/libbin.so")
-	copyFile(bindir+"/"+binname+"_android_386", workdir+"/app/src/main/resources/lib/x86/libbin.so")
-	copyFile(bindir+"/"+binname+"_android_arm", workdir+"/app/src/main/resources/lib/armeabi-v7a/libbin.so")
-	copyFile(bindir+"/"+binname+"_android_arm64", workdir+"/app/src/main/resources/lib/arm64/libbin.so")
+	if GOARCH == "amd64" || GOARCH == "all" {
+		copyFile(bindir+"/"+binname+"_android_amd64", workdir+"/app/src/main/resources/lib/x86_64/libbin.so")
+	}
+	if GOARCH == "386" || GOARCH == "all" {
+		copyFile(bindir+"/"+binname+"_android_386", workdir+"/app/src/main/resources/lib/x86/libbin.so")
+	}
+	if GOARCH == "arm" || GOARCH == "all" {
+		copyFile(bindir+"/"+binname+"_android_arm", workdir+"/app/src/main/resources/lib/armeabi-v7a/libbin.so")
+	}
+	if GOARCH == "amd64" || GOARCH == "all" {
+		copyFile(bindir+"/"+binname+"_android_arm64", workdir+"/app/src/main/resources/lib/arm64/libbin.so")
+	}
 	//copyFile(bindir+"/"+binname+"_android_amd64", workdir+"/app/src/main/jniLibs/x86_64/libbin.so")
 	//copyFile(bindir+"/"+binname+"_android_386", workdir+"/app/src/main/jniLibs/x86/libbin.so")
 	//copyFile(bindir+"/"+binname+"_android_arm", workdir+"/app/src/main/jniLibs/armeabi-v7a/libbin.so")
@@ -73,7 +81,7 @@ func Package(binname string, bindir string, apkdir string, version string, appur
 	}
 	os.Chdir(wd)
 	log.Println("Copying target app..")
-	copyFile(workdir+"/app/build/outputs/apk/debug/app-debug.apk", apkdir+"/"+binname+".all.apk")
+	copyFile(workdir+"/app/build/outputs/apk/debug/app-debug.apk", apkdir+"/"+binname+"."+GOARCH+".apk")
 }
 
 func copyFile(src string, dst string) {
