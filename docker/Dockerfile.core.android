@@ -4,7 +4,7 @@ RUN apt install -y default-jre
 WORKDIR /go
 RUN goprod ndk-update
 RUN goprod accept-license
-COPY usr/android /a 
+COPY usr/android-standard /a 
 WORKDIR /a
 # This command wil for sure fail - but that doesn't matter - It's just required to
 #download the dependencies
