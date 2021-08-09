@@ -38,7 +38,7 @@ func Build(combo string, binname string, bindir string, debdir string, version s
 	//TODO: remove `exec` and use go-git?
 	email, err := exec.Command("git", "config", "user.email").Output()
 	if err != nil {
-		log.Println("WARN:", err)
+		log.Println("WARN:", err, "please do `git config user.email \"your@email\"' to configure email address.")
 		email = []byte(os.Getenv("EMAIL"))
 		if string(email) == "" {
 			email = []byte("no-reply@example.com")
@@ -71,7 +71,7 @@ func Build(combo string, binname string, bindir string, debdir string, version s
 		"--install=no",
 		"--default",
 		"--pkgname="+binname,
-		"--pkgversion="+version+"+git"+commit,
+		"--pkgversion="+version+,
 		"--arch="+arch,
 		"--pakdir="+debdir,
 		"--maintainer="+emails,

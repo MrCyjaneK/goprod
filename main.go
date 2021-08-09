@@ -13,7 +13,7 @@ import (
 	"os/user"
 	"path"
 	"path/filepath"
-	"strconv"
+	"runtime"
 	"strings"
 	"time"
 
@@ -24,21 +24,37 @@ import (
 	gosh "git.mrcyjanek.net/mrcyjanek/gosh/_core"
 )
 
+const (
+	default_combo       = runtime.GOOS + "/" + runtime.GOARCH
+	default_builddir    = "build"
+	default_ldflags     = ""
+	default_binname     = "binname"
+	default_tags        = "goprod"
+	default_version     = "1.0.0"
+	default_shouldpkg   = true
+	default_apkit       = true
+	default_appurl      = "http://127.0.0.1:8081"
+	default_deltmp      = true
+	default_buildcmd    = ""
+	default_apktemplate = "console"
+)
+
 var (
-	combo    = flag.String("combo", "linux/arm;linux/386;linux/arm64;linux/amd64", "Combo that I should serve")
-	builddir = flag.String("builddir", "build", "Where should the files get saved.")
-	ldflags  = flag.String("ldflags", "", "Things to get passwd by with --ldflags")
-	binname  = flag.String("binname", "helloworld", "What is the program name?")
-	tags     = flag.String("tags", "goprod", "Tags that are passed to go build command")
-	versiona = flag.String("version", "0.0.1", "Version of your program.")
+	combo     = flag.String("combo", default_combo, "Which combo should I serve?")
+	builddir  = flag.String("builddir", default_builddir, "Where should the files get saved.")
+	ldflags   = flag.String("ldflags", default_ldflags, "Things to get passwd by with --ldflags")
+	binname   = flag.String("binname", default_binname, "What is the program name?")
+	tags      = flag.String("tags", default_tags, "Tags that are passed to go build command")
+	version_a = flag.String("version", default_version, "Version of your program.")
 	//TODO: Do **NOT** hardcode the path here, bruh.
-	ndka      = flag.String("ndk", "~/Android/Sdk/ndk/android-ndk-r22b/toolchains/llvm/prebuilt/linux-x86_64/bin/", "Path to android toolchain")
-	sdkpath   = flag.String("sdkpath", "~/Android/Sdk/", "Path to android Sdk")
-	shouldpkg = flag.Bool("package", true, "Should we create a package out of the binary?")
-	apkit     = flag.Bool("apkit", true, "Should I create android app?")
-	appurl    = flag.String("appurl", "http://127.0.0.1:8081/", "What url should I open in native app?")
-	deltmp    = flag.Bool("deltmp", true, "Should I delete tmp files?")
-	buildcmd  = flag.String("buildcmd", "", "What command should be used to build the program? Defaults to 'go build`")
+	ndk_a       = flag.String("ndk", "~/Android/Sdk/ndk/android-ndk-r22b/toolchains/llvm/prebuilt/linux-x86_64/bin/", "Path to android toolchain")
+	sdk_a       = flag.String("sdkpath", "~/Android/Sdk/", "Path to android Sdk")
+	shouldpkg   = flag.Bool("shouldpkg", default_shouldpkg, "Should we create a package out of the binary?")
+	apkit       = flag.Bool("apkit", default_apkit, "Should I create android app?")
+	appurl      = flag.String("appurl", default_appurl, "What url should I open in native app?")
+	deltmp      = flag.Bool("deltmp", default_deltmp, "Should I delete tmp files?")
+	buildcmd    = flag.String("buildcmd", default_buildcmd, "What command should be used to build the program? Defaults to 'go build`")
+	apktemplate = flag.String("apktemplate", default_apktemplate, "Which template should I use for building the .apk?")
 )
 var ndk string
 var sdk string
@@ -47,23 +63,19 @@ var version string
 func main() {
 	log.SetFlags(log.LstdFlags | log.Llongfile)
 	flag.Parse()
-	t := time.Now()
-	year := "" + strconv.Itoa(t.Year())
-	month := "0" + strconv.Itoa(int(t.Month()))
-	month = month[len(month)-2:]
-	day := "0" + strconv.Itoa(t.Day())
-	day = day[len(day)-2:]
-	hour := "0" + strconv.Itoa(t.Hour())
-	hour = hour[len(hour)-2:]
-	minute := "0" + strconv.Itoa(t.Minute())
-	minute = minute[len(minute)-2:]
-	version = *versiona + "-" + year + month + day + hour + minute
+	verout, err := exec.Command("git", "show", "-s", "--date=format:'%Y%m%d%H%M'", "--format=%cd").Output()
+	if err != nil {
+		verout = []byte("99999notagitrepo")
+	}
+	commit := strings.Split(string(verout), "\n")[0]
+	version = *version_a + "+git" + commit
+
 	usr, err := user.Current()
 	if err != nil {
 		log.Fatal("user.Current():", err)
 	}
-	ndk = strings.ReplaceAll(*ndka, "~", usr.HomeDir)
-	sdk = strings.ReplaceAll(*sdkpath, "~", usr.HomeDir)
+	ndk = strings.ReplaceAll(*ndk_a, "~", usr.HomeDir)
+	sdk = strings.ReplaceAll(*sdk_a, "~", usr.HomeDir)
 	if len(os.Args) == 2 {
 		switch os.Args[1] {
 		case "ndk-update":
@@ -89,10 +101,14 @@ func main() {
 			log.Fatal("Invalid combo '" + i + "' provided.")
 		}
 		GOOS := spl[0]
+		GOARCH := spl[1]
 		log.Println("Compiling...")
 		buildargs, err := gosh.Split(*buildcmd)
 		if err != nil {
 			log.Fatal("Unable to parse command: '"+*buildcmd+"'", err)
+		}
+		if GOOS == "android" && GOARCH == "all" {
+			continue
 		}
 		compiler.Build(i, *tags, *binname, *builddir+"/bin", ndk, *ldflags, buildargs)
 		if GOOS == "linux" && *shouldpkg {
@@ -106,9 +122,9 @@ func main() {
 		if GOOS == "android" {
 			androidused = true
 		}
-	}
-	if *apkit && androidused {
-		apkpackage.Package(*binname, *builddir+"/bin", *builddir+"/apk", version, *appurl, sdk, *deltmp)
+		if *apkit && androidused {
+			apkpackage.Package(*binname, *builddir+"/bin", *builddir+"/apk", version, *appurl, sdk, *deltmp, *apktemplate)
+		}
 	}
 }
 
