@@ -9,4 +9,3 @@ script:
   - cp build/bin/goprod* /archive
   - cp build/deb/goprod*.deb /apt
   - make docker
-  - make docker_push
