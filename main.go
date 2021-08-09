@@ -118,7 +118,7 @@ func main() {
 			log.Println("Packaging...")
 			macpackage.Package(i, *binname, *builddir+"/bin", *builddir+"/mac", version)
 		}
-		if *apkit {
+		if GOOS == "android" && *apkit {
 			apkpackage.Package(*binname, *builddir+"/bin", *builddir+"/apk", version, *appurl, sdk, *deltmp, *apktemplate, GOARCH)
 		}
 	}
