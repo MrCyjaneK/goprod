@@ -4,6 +4,7 @@ package apkpackage
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -47,21 +48,21 @@ func Package(binname string, bindir string, apkdir string, version string, appur
 	os.Rename(workdir+"/app/src/test/java/x/x/@appname@", workdir+"/app/src/test/java/x/x/"+binname)
 	log.Println("Copying binaries.")
 	if GOARCH == "amd64" || GOARCH == "all" {
+		copyFile(bindir+"/"+binname+"_android_amd64", workdir+"/app/src/main/jniLibs/x86_64/libbin.so")
 		copyFile(bindir+"/"+binname+"_android_amd64", workdir+"/app/src/main/resources/lib/x86_64/libbin.so")
 	}
 	if GOARCH == "386" || GOARCH == "all" {
+		copyFile(bindir+"/"+binname+"_android_386", workdir+"/app/src/main/jniLibs/x86/libbin.so")
 		copyFile(bindir+"/"+binname+"_android_386", workdir+"/app/src/main/resources/lib/x86/libbin.so")
 	}
 	if GOARCH == "arm" || GOARCH == "all" {
+		copyFile(bindir+"/"+binname+"_android_arm", workdir+"/app/src/main/jniLibs/armeabi-v7a/libbin.so")
 		copyFile(bindir+"/"+binname+"_android_arm", workdir+"/app/src/main/resources/lib/armeabi-v7a/libbin.so")
 	}
-	if GOARCH == "amd64" || GOARCH == "all" {
+	if GOARCH == "arm64" || GOARCH == "all" {
+		copyFile(bindir+"/"+binname+"_android_arm64", workdir+"/app/src/main/jniLibs/arm64/libbin.so")
 		copyFile(bindir+"/"+binname+"_android_arm64", workdir+"/app/src/main/resources/lib/arm64/libbin.so")
 	}
-	//copyFile(bindir+"/"+binname+"_android_amd64", workdir+"/app/src/main/jniLibs/x86_64/libbin.so")
-	//copyFile(bindir+"/"+binname+"_android_386", workdir+"/app/src/main/jniLibs/x86/libbin.so")
-	//copyFile(bindir+"/"+binname+"_android_arm", workdir+"/app/src/main/jniLibs/armeabi-v7a/libbin.so")
-	//copyFile(bindir+"/"+binname+"_android_arm64", workdir+"/app/src/main/jniLibs/arm64/libbin.so")
 	log.Println("Building yay.")
 	wd, err := os.Getwd()
 	if err != nil {
@@ -85,6 +86,7 @@ func Package(binname string, bindir string, apkdir string, version string, appur
 }
 
 func copyFile(src string, dst string) {
+	fmt.Println("copyFile", src, "->", dst)
 	input, err := ioutil.ReadFile(src)
 	if err != nil {
 		log.Println(err)

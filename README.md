@@ -41,6 +41,10 @@ You can build and package for:
 
 I generally recommend you using the docker image if you have some CI/CD solution installed (btw you should use [Abstruse](https://github.com/bleenco/abstruse)). If you want to run something on your machine just for development - then grab a copy of `gcc` and `g++` and `checkinstall`, and make sure that `/bin/x86_64-linux-gnu-g++` is a symlink to your gcc, on debian it's automatic (afaik) but on arch I had to do that manually. So keep this in mind when something goes wrong with GCC.
 
+## Reference app
+
+For an reference app check out [magnetgraph](https://github.com/MrCyjaneK/magnetgraph) I use goprod to package it
+
 ## Preparing
 
 You need to install depedencies, for debian check `docker/` for an up-to-date list of **all** depedencies (you usually don't need all of them, unless you deploy from the machine on which you work.)

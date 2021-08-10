@@ -1,7 +1,7 @@
 .PHONY: docker docker_push
 install:
 	cp build/bin/${BINNAME}_${GOOS}_${GOARCH} /usr/bin/${BINNAME}
-	cp usr/ /usr/share/goprod -r
+	cp usr/* /usr/share/goprod -r
 docker:
 	docker build . -f docker/Dockerfile.core -t mrcyjanek/goprod:core
 	docker build . -f docker/Dockerfile.nodejs -t mrcyjanek/goprod:nodejs
