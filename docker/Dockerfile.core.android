@@ -14,4 +14,4 @@ RUN echo ANDROID_SDK_ROOT=/root/Android/Sdk > /etc/environment
 COPY . /go/src/git.mrcyjanek.net/goprod/
 WORKDIR /go/src/git.mrcyjanek.net/goprod/
 RUN go run main.go -combo="linux/amd64" -builddir="build" -binname="goprod"
-RUN apt install ./build/deb/goprod*.deb -y
+RUN apt install ./build/deb/goprod*.deb -y --allow-downgrades

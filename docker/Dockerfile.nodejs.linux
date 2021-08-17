@@ -28,4 +28,4 @@ RUN ln -s $(go env GOPATH)/bin/appimagetool /usr/bin/appimagetool
 COPY . /go/src/git.mrcyjanek.net/goprod/
 WORKDIR /go/src/git.mrcyjanek.net/goprod/
 RUN go run main.go -combo="linux/amd64" -builddir="build" -binname="goprod"
-RUN apt install ./build/deb/goprod*.deb -y
+RUN apt install ./build/deb/goprod*.deb -y --allow-downgrades
