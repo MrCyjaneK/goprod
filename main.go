@@ -212,13 +212,12 @@ func updateNdk() {
 	defer resp.Body.Close()
 	body, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("ioutil.ReadAll", err)
 	}
 	stra := strings.Split(string(body), ">")
-	str := grep("linux-x86_64.zip", stra)
-	str = grep("href", str)
+	str := grep("-linux.zip", stra)
 	str = strings.Split(strings.Join(str, "\""), "\"")
-	link = str[1]
+	link = str[9]
 	b, err = os.ReadFile(path.Join(sdk, "version-ndk"))
 	if err != nil || string(b) == link {
 		log.Println("current version", string(b), "google's version:", link)
