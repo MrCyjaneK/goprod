@@ -146,8 +146,8 @@ func Build(combo string, tags string, binname string, builddir string, ndk strin
 	cmd.Stdout = &outbuf
 	cmd.Stderr = &errbuf
 	err = cmd.Run()
-	log.Println("out:", outbuf.String(), "err:", errbuf.String())
 	if err != nil {
+		log.Println("out:", outbuf.String(), "err:", errbuf.String())
 		log.Fatal("err:", err)
 	}
 }

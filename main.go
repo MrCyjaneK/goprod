@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"git.mrcyjanek.net/mrcyjanek/goprod/apkpackage"
+	"git.mrcyjanek.net/mrcyjanek/goprod/appimage"
 	"git.mrcyjanek.net/mrcyjanek/goprod/compiler"
 	"git.mrcyjanek.net/mrcyjanek/goprod/debpackage"
 	"git.mrcyjanek.net/mrcyjanek/goprod/macpackage"
@@ -37,6 +38,7 @@ const (
 	default_deltmp      = true
 	default_buildcmd    = ""
 	default_apktemplate = "console"
+	default_appimageit  = false
 )
 
 var (
@@ -55,6 +57,7 @@ var (
 	deltmp      = flag.Bool("deltmp", default_deltmp, "Should I delete tmp files?")
 	buildcmd    = flag.String("buildcmd", default_buildcmd, "What command should be used to build the program? Defaults to 'go build`")
 	apktemplate = flag.String("apktemplate", default_apktemplate, "Which template should I use for building the .apk?")
+	appimageit  = flag.Bool("appimageit", default_appimageit, "Should I create tha appimage?")
 )
 var ndk string
 var sdk string
@@ -63,7 +66,7 @@ var version string
 func main() {
 	log.SetFlags(log.LstdFlags | log.Llongfile)
 	flag.Parse()
-	verout, err := exec.Command("git", "show", "-s", "--date=format:'%Y%m%d%H%M'", "--format=%cd").Output()
+	verout, err := exec.Command("git", "show", "-s", "--date=format:%Y%m%d%H%M", "--format=%cd").Output()
 	if err != nil {
 		verout = []byte("99999notagitrepo")
 	}
@@ -111,14 +114,19 @@ func main() {
 		}
 		compiler.Build(i, *tags, *binname, *builddir+"/bin", ndk, *ldflags, buildargs)
 		if GOOS == "linux" && *shouldpkg {
-			log.Println("Packaging...")
+			log.Println("Packaging (deb)...")
 			debpackage.Build(i, *binname, *builddir+"/bin", *builddir+"/deb", version)
 		}
+		if GOOS == "linux" && *appimageit {
+			log.Println("Packaging (appimage)...")
+			appimage.Package(buildargs, *ldflags, *builddir+"/AppDir", *binname, GOOS, GOARCH, *tags, version, *builddir+"/appimage")
+		}
 		if GOOS == "darwin" && *shouldpkg {
-			log.Println("Packaging...")
+			log.Println("Packaging (zip)...")
 			macpackage.Package(i, *binname, *builddir+"/bin", *builddir+"/mac", version)
 		}
 		if GOOS == "android" && *apkit {
+			log.Println("Packaging (apk)...")
 			apkpackage.Package(*binname, *builddir+"/bin", *builddir+"/apk", version, *appurl, sdk, *deltmp, *apktemplate, GOARCH)
 		}
 	}

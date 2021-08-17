@@ -6,6 +6,21 @@ RUN apt install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
 RUN apt install -y gcc-i686-linux-gnu g++-i686-linux-gnu
 RUN apt install -y gcc g++
 
+RUN apt install -y patchelf squashfs-tools desktop-file-utils
+# dummy uploadtool
+RUN touch /bin/uploadtool
+RUN chmod +x /bin/uploadtool
+
+# Runtimes
+RUN wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-aarch64 -O /go/bin/runtime-aarch64
+RUN wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-armhf -O /go/bin/runtime-armhf
+RUN wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-i686 -O /go/bin/runtime-i686
+RUN wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-x86_64 -O /go/bin/runtime-x86_64
+RUN chmod +x /go/bin/runtime-aarch64 /go/bin/runtime-armhf /go/bin/runtime-i686 /go/bin/runtime-x86_64
+
+RUN go get -v github.com/probonopd/go-appimage/src/appimagetool
+RUN ln -s $(go env GOPATH)/bin/appimagetool /usr/bin/appimagetool
+
 #COPY usr/golang/stdreq /a
 #RUN goprod -combo="linux/amd64;linux/386;linux/arm;linux/arm64"
 #RUN rm -rf /a
