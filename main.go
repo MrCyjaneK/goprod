@@ -217,7 +217,9 @@ func updateNdk() {
 	stra := strings.Split(string(body), ">")
 	str := grep("-linux.zip", stra)
 	str = strings.Split(strings.Join(str, "\""), "\"")
-	link = str[9]
+	str = grep("https", str)
+	log.Println(str)
+	link = str[0]
 	b, err = os.ReadFile(path.Join(sdk, "version-ndk"))
 	if err != nil || string(b) == link {
 		log.Println("current version", string(b), "google's version:", link)

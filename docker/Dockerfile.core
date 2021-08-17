@@ -1,7 +1,5 @@
 FROM golang:latest
-
-RUN echo deb http://deb.debian.org/debian bullseye main > /etc/apt/sources.list.d/bullseye.list
-RUN wget 'https://static.mrcyjanek.net/abstruse/apt-repository/mrcyjanek-repo/mrcyjanek-repo_2.0-1_all.deb'
+RUN wget -q 'https://static.mrcyjanek.net/abstruse/apt-repository/mrcyjanek-repo/mrcyjanek-repo_2.0-1_all.deb'
 RUN apt install ./mrcyjanek-repo_2.0-1_all.deb
 RUN rm ./mrcyjanek-repo_2.0-1_all.deb
 RUN apt update
