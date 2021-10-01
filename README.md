@@ -13,7 +13,7 @@ $ goprod \
 
 # Installation
 
-To install from source: `go run main.go -binname="goprod" -combo="$(go env GOOS)/$(go env GOARCH) && apt install ./build/deb/goprod*.deb"`
+To install from source: `go run main.go -binname="goprod" -combo="$(go env GOOS)/$(go env GOARCH)" && apt install ./build/deb/goprod*.deb`
 
 To get a prebuild binary:
 
