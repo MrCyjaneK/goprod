@@ -39,6 +39,7 @@ const (
 	default_buildcmd    = ""
 	default_apktemplate = "console"
 	default_appimageit  = false
+	default_cgo         = true
 )
 
 var (
@@ -58,6 +59,7 @@ var (
 	buildcmd    = flag.String("buildcmd", default_buildcmd, "What command should be used to build the program? Defaults to 'go build`")
 	apktemplate = flag.String("apktemplate", default_apktemplate, "Which template should I use for building the .apk?")
 	appimageit  = flag.Bool("appimageit", default_appimageit, "Should I create tha appimage?")
+	cgo         = flag.Bool("cgo", default_cgo, "Should use cgo?")
 )
 var ndk string
 var sdk string
@@ -112,7 +114,7 @@ func main() {
 		if GOOS == "android" && GOARCH == "all" {
 			continue
 		}
-		compiler.Build(i, *tags, *binname, *builddir+"/bin", ndk, *ldflags, buildargs)
+		compiler.Build(i, *tags, *binname, *builddir+"/bin", ndk, *ldflags, buildargs, *cgo)
 		if GOOS == "linux" && *shouldpkg {
 			log.Println("Packaging (deb)...")
 			debpackage.Build(i, *binname, *builddir+"/bin", *builddir+"/deb", version)
