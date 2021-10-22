@@ -49,7 +49,7 @@ var (
 	tags      = flag.String("tags", default_tags, "Tags that are passed to go build command")
 	version_a = flag.String("version", default_version, "Version of your program.")
 	//TODO: Do **NOT** hardcode the path here, bruh.
-	ndk_a       = flag.String("ndk", "~/Android/Sdk/ndk/android-ndk-r22b/toolchains/llvm/prebuilt/linux-x86_64/bin/", "Path to android toolchain")
+	ndk_a       = flag.String("ndk", "~/Android/Sdk/ndk/android-ndk-r23/toolchains/llvm/prebuilt/linux-x86_64/bin/", "Path to android toolchain")
 	sdk_a       = flag.String("sdkpath", "~/Android/Sdk/", "Path to android Sdk")
 	shouldpkg   = flag.Bool("shouldpkg", default_shouldpkg, "Should we create a package out of the binary?")
 	apkit       = flag.Bool("apkit", default_apkit, "Should I create android app?")
