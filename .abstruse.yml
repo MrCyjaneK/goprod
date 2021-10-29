@@ -1,6 +1,5 @@
-image: golang:buster
+image: golang:latest
 before_script:
-  - echo -n -e "\n\ndeb http://deb.debian.org/debian buster-backports main\n" >> /etc/apt/sources.list
   - apt update
   - apt install checkinstall -y
 
