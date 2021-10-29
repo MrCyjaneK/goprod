@@ -60,8 +60,8 @@ func Package(binname string, bindir string, apkdir string, version string, appur
 		copyFile(bindir+"/"+binname+"_android_arm", workdir+"/app/src/main/resources/lib/armeabi-v7a/libbin.so")
 	}
 	if GOARCH == "arm64" || GOARCH == "all" {
-		copyFile(bindir+"/"+binname+"_android_arm64", workdir+"/app/src/main/jniLibs/arm64/libbin.so")
-		copyFile(bindir+"/"+binname+"_android_arm64", workdir+"/app/src/main/resources/lib/arm64/libbin.so")
+		copyFile(bindir+"/"+binname+"_android_arm64", workdir+"/app/src/main/jniLibs/arm64-v8a/libbin.so")
+		copyFile(bindir+"/"+binname+"_android_arm64", workdir+"/app/src/main/resources/lib/arm64-v8a/libbin.so")
 	}
 	log.Println("Building yay.")
 	wd, err := os.Getwd()

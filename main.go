@@ -112,6 +112,7 @@ func main() {
 			log.Fatal("Unable to parse command: '"+*buildcmd+"'", err)
 		}
 		if GOOS == "android" && GOARCH == "all" {
+			apkpackage.Package(*binname, *builddir+"/bin", *builddir+"/apk", version, *appurl, sdk, *deltmp, *apktemplate, GOARCH)
 			continue
 		}
 		compiler.Build(i, *tags, *binname, *builddir+"/bin", ndk, *ldflags, buildargs, *cgo)
